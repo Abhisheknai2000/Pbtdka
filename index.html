@@ -1,36 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Movie App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" href="style.css">
-
+<meta charset="UTF-8">
+<title>Movies</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- 🔥 Header -->
-<div class="header">Punjabi Movies</div>
-
-<!-- 🔍 Search bar -->
-<input type="text" id="search" placeholder="Search movie...">
-
-<!-- 🎬 Movies Grid -->
-<div class="grid" id="movieList"></div>
-
-<!-- 🎥 Player Modal -->
-<div id="playerModal">
-
-  <!-- Close button -->
-  <span class="closeBtn" onclick="closePlayer()">✖</span>
-
-  <!-- 🔥 IMPORTANT iframe player -->
-  <iframe id="videoFrame" allowfullscreen></iframe>
-
+<div class="navbar">
+  <div class="logo">My OTT</div>
 </div>
 
-<!-- JS -->
-<script src="script.js"></script>
+<div class="container">
+  <div class="grid" id="movies"></div>
+</div>
 
+<script src="script.js"></script>
 </body>
 </html>
