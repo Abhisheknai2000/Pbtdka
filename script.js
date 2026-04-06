@@ -10,35 +10,19 @@ fetch(sheetURL)
         const card = document.createElement("div");
         card.className = "card";
 
-        // ✅ SAFE DATA (case-insensitive)
         const title = movie.Title || movie.title || "No Title";
-        const image = movie.Image || movie.image || "https://via.placeholder.com/300x400?text=No+Image";
+        const image = movie.Image || movie.image || "";
+        const video = (movie.video || movie.Video || "").trim();
 
-        // ✅ VIDEO LINK DETECT (ALL CASES)
-        const video = (
-            movie.video ||
-            movie.Video ||
-            movie.link ||
-            movie.Link ||
-            movie.url ||
-            movie.Url ||
-            ""
-        ).trim();
-
-        // 🔥 DEBUG (console me check kar sakta hai)
-        console.log("Movie:", title);
-        console.log("Video:", video);
-
-        // 🎬 CARD UI
         card.innerHTML = `
-            <img src="${image}" alt="${title}" loading="lazy">
+            <img src="${image}" alt="${title}">
             <div class="card-title">${title}</div>
         `;
 
-        // 👉 CLICK ACTION
         card.onclick = () => {
-            if (video) {
-                window.location.href = `watch.html?video=${encodeURIComponent(video)}&title=${encodeURIComponent(title)}`;
+            if(video) {
+                // ✅ FIXED ROUTE
+                window.location.href = `/watch?video=${encodeURIComponent(video)}&title=${encodeURIComponent(title)}`;
             } else {
                 alert("Video link not available");
             }
@@ -46,7 +30,4 @@ fetch(sheetURL)
 
         container.appendChild(card);
     });
-})
-.catch(err => {
-    console.error("Error loading sheet:", err);
 });
