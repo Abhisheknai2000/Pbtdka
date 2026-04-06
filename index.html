@@ -1,28 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Movie App</title>
+  <title>Punjabi Movies App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="header">My Movie App</div>
-
-<input type="text" id="search" placeholder="Search movie...">
+<div class="header">Punjabi Movies</div>
 
 <div class="grid" id="movieList"></div>
 
 <div id="playerModal">
   <span class="closeBtn" onclick="closePlayer()">✖</span>
-  <video id="videoPlayer"></video>
-
-  <div class="controls">
-    <button onclick="back()">⏪ 10s</button>
-    <button onclick="forward()">⏩ 10s</button>
-    <input type="range" min="0" max="1" step="0.1" id="volume">
-    <button onclick="fullscreen()">⛶</button>
-  </div>
+  <video id="videoPlayer" controls autoplay></video>
 </div>
 
 <script src="script.js"></script>
