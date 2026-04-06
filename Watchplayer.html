@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Watch</title>
-<link rel="stylesheet" href="../style.css">
-
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<link rel="stylesheet" href="style.css">
 
 <style>
 .player-container {
@@ -15,7 +13,8 @@
   max-width: 900px;
   margin: auto;
 }
-iframe, video {
+
+video, iframe {
   width: 100%;
   height: 500px;
   border-radius: 10px;
@@ -28,9 +27,7 @@ iframe, video {
 <div class="container">
   <h2 id="title"></h2>
 
-  <div class="player-container" id="playerBox">
-    <!-- Player auto load hoga -->
-  </div>
+  <div class="player-container" id="playerBox"></div>
 </div>
 
 <script>
@@ -43,45 +40,31 @@ document.getElementById("title").innerText = title;
 
 const playerBox = document.getElementById("playerBox");
 
-// 🔥 FUNCTION: Detect player type
-function loadPlayer(url) {
+function createVideoPlayer(url) {
+  const video = document.createElement("video");
 
-  // 👉 M3U8 (HLS)
-  if (url.includes(".m3u8")) {
-    const video = document.createElement("video");
-    video.controls = true;
+  video.controls = true;
+  video.autoplay = true;
+  video.playsInline = true;
 
-    playerBox.appendChild(video);
+  // 🔥 important headers workaround
+  video.setAttribute("crossorigin", "anonymous");
 
-    if (Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(url);
-      hls.attachMedia(video);
-    } else {
-      video.src = url;
-    }
-  }
+  video.src = url;
 
-  // 👉 MP4 / Direct video
-  else if (url.match(/\.(mp4|webm|ogg)$/)) {
-    const video = document.createElement("video");
-    video.src = url;
-    video.controls = true;
-    playerBox.appendChild(video);
-  }
+  playerBox.appendChild(video);
 
-  // 👉 EMBED / iframe links
-  else {
-    const iframe = document.createElement("iframe");
-    iframe.src = url;
-    iframe.allowFullscreen = true;
-    playerBox.appendChild(iframe);
-  }
+  // ❌ if fails → fallback iframe
+  video.onerror = () => {
+    playerBox.innerHTML = `
+      <iframe src="${url}" allowfullscreen></iframe>
+    `;
+  };
 }
 
 // 🚀 LOAD PLAYER
 if(videoSrc) {
-  loadPlayer(videoSrc);
+  createVideoPlayer(videoSrc);
 } else {
   playerBox.innerHTML = "<p>No video found</p>";
 }
