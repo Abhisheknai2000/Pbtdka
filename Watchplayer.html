@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Watch</title>
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+
+<div class="container">
+  <h2 id="title"></h2>
+
+  <video id="player" controls width="100%" style="border-radius:10px;"></video>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const videoSrc = decodeURIComponent(params.get("video"));
+const title = decodeURIComponent(params.get("title"));
+
+document.getElementById("title").innerText = title;
+
+const video = document.getElementById("player");
+
+if(videoSrc.endsWith(".m3u8")) {
+    if(Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(videoSrc);
+        hls.attachMedia(video);
+    }
+} else {
+    video.src = videoSrc;
+}
+</script>
+
+</body>
+</html>
