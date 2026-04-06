@@ -10,25 +10,35 @@ fetch(sheetURL)
         const card = document.createElement("div");
         card.className = "card";
 
-        // 🔥 sab keys print karo
+        // 🔥 DEBUG
         console.log("Movie object:", movie);
 
-        const title = movie.Title || movie.title || "";
-        const image = movie.Image || movie.image || "";
+        // ✅ SAFE VALUES
+        const title = movie.Title || movie.title || "No Title";
+        const image = movie.Image || movie.image || "https://via.placeholder.com/300x400?text=No+Image";
         
-        // 🔥 ALL POSSIBLE KEYS
-        const video = movie.video || movie.Video || movie.link || movie.Link || movie.url || movie.Url || "";
+        // ✅ VIDEO DETECT (ALL CASES)
+        const video = (
+            movie.video ||
+            movie.Video ||
+            movie.link ||
+            movie.Link ||
+            movie.url ||
+            movie.Url ||
+            ""
+        ).trim();
 
         card.innerHTML = `
-            <img src="${image}" alt="${title}">
+            <img src="${image}" alt="${title}" loading="lazy">
             <div class="card-title">${title}</div>
         `;
 
         card.onclick = () => {
-            console.log("VIDEO LINK:", video); // 👈 check click pe
+            console.log("VIDEO LINK:", video);
 
-            if(video && video.trim() !== "") {
-                window.location.href = `watch.html?video=${encodeURIComponent(video)}&title=${encodeURIComponent(title)}`;
+            if (video) {
+                // 🔥 IMPORTANT FIX (FILE NAME MATCH)
+                window.location.href = `Watchplayer.html?video=${encodeURIComponent(video)}&title=${encodeURIComponent(title)}`;
             } else {
                 alert("Video link not available");
             }
@@ -36,4 +46,7 @@ fetch(sheetURL)
 
         container.appendChild(card);
     });
+})
+.catch(err => {
+    console.error("Error loading sheet:", err);
 });
