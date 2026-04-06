@@ -10,14 +10,11 @@ fetch(sheetURL)
         const card = document.createElement("div");
         card.className = "card";
 
-        // 🔥 DEBUG
-        console.log("Movie object:", movie);
-
-        // ✅ SAFE VALUES
+        // ✅ SAFE DATA (case-insensitive)
         const title = movie.Title || movie.title || "No Title";
         const image = movie.Image || movie.image || "https://via.placeholder.com/300x400?text=No+Image";
-        
-        // ✅ VIDEO DETECT (ALL CASES)
+
+        // ✅ VIDEO LINK DETECT (ALL CASES)
         const video = (
             movie.video ||
             movie.Video ||
@@ -28,17 +25,20 @@ fetch(sheetURL)
             ""
         ).trim();
 
+        // 🔥 DEBUG (console me check kar sakta hai)
+        console.log("Movie:", title);
+        console.log("Video:", video);
+
+        // 🎬 CARD UI
         card.innerHTML = `
             <img src="${image}" alt="${title}" loading="lazy">
             <div class="card-title">${title}</div>
         `;
 
+        // 👉 CLICK ACTION
         card.onclick = () => {
-            console.log("VIDEO LINK:", video);
-
             if (video) {
-                // 🔥 IMPORTANT FIX (FILE NAME MATCH)
-                window.location.href = `Watchplayer.html?video=${encodeURIComponent(video)}&title=${encodeURIComponent(title)}`;
+                window.location.href = `watch.html?video=${encodeURIComponent(video)}&title=${encodeURIComponent(title)}`;
             } else {
                 alert("Video link not available");
             }
