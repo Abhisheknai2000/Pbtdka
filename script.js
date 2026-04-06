@@ -9,13 +9,18 @@ fetch(sheetURL)
         const card = document.createElement("div");
         card.className = "card";
 
+        // CHANGE THESE ACCORDING TO YOUR SHEET
+        const title = movie.Title;
+        const image = movie.Image;
+        const video = movie.Video;
+
         card.innerHTML = `
-            <img src="${movie.image}" alt="${movie.title}">
-            <div class="card-title">${movie.title}</div>
+            <img src="${image}" alt="${title}">
+            <div class="card-title">${title}</div>
         `;
 
         card.onclick = () => {
-            window.location.href = `watch.html?video=${encodeURIComponent(movie.video)}&title=${encodeURIComponent(movie.title)}`;
+            window.location.href = `/watch?video=${encodeURIComponent(video)}&title=${encodeURIComponent(title)}`;
         };
 
         container.appendChild(card);
