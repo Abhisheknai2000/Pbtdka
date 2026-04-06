@@ -1,21 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Punjabi Movies App</title>
+  <title>Movie App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="style.css">
+
 </head>
 <body>
 
+<!-- 🔥 Header -->
 <div class="header">Punjabi Movies</div>
 
+<!-- 🔍 Search bar -->
+<input type="text" id="search" placeholder="Search movie...">
+
+<!-- 🎬 Movies Grid -->
 <div class="grid" id="movieList"></div>
 
+<!-- 🎥 Player Modal -->
 <div id="playerModal">
+
+  <!-- Close button -->
   <span class="closeBtn" onclick="closePlayer()">✖</span>
-  <video id="videoPlayer" controls autoplay></video>
+
+  <!-- 🔥 IMPORTANT iframe player -->
+  <iframe id="videoFrame" allowfullscreen></iframe>
+
 </div>
 
+<!-- JS -->
 <script src="script.js"></script>
+
 </body>
 </html>
