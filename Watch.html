@@ -7,6 +7,8 @@
 <title>Watch</title>
 <link rel="stylesheet" href="style.css">
 
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
 <style>
 .player-container {
   width: 100%;
@@ -40,31 +42,47 @@ document.getElementById("title").innerText = title;
 
 const playerBox = document.getElementById("playerBox");
 
-function createVideoPlayer(url) {
-  const video = document.createElement("video");
+// 🔥 SMART PLAYER FUNCTION
+function loadPlayer(url) {
 
-  video.controls = true;
-  video.autoplay = true;
-  video.playsInline = true;
+  // 👉 HLS (.m3u8)
+  if (url.includes(".m3u8")) {
+    const video = document.createElement("video");
+    video.controls = true;
+    video.autoplay = true;
 
-  // 🔥 important headers workaround
-  video.setAttribute("crossorigin", "anonymous");
+    playerBox.appendChild(video);
 
-  video.src = url;
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(url);
+      hls.attachMedia(video);
+    } else {
+      video.src = url;
+    }
+  }
 
-  playerBox.appendChild(video);
+  // 👉 MP4 / direct video
+  else if (url.match(/\.(mp4|webm|ogg)/)) {
+    const video = document.createElement("video");
+    video.src = url;
+    video.controls = true;
+    video.autoplay = true;
 
-  // ❌ if fails → fallback iframe
-  video.onerror = () => {
+    playerBox.appendChild(video);
+  }
+
+  // 👉 UNKNOWN / workers.dev type (FORCE iframe)
+  else {
     playerBox.innerHTML = `
       <iframe src="${url}" allowfullscreen></iframe>
     `;
-  };
+  }
 }
 
 // 🚀 LOAD PLAYER
-if(videoSrc) {
-  createVideoPlayer(videoSrc);
+if (videoSrc) {
+  loadPlayer(videoSrc);
 } else {
   playerBox.innerHTML = "<p>No video found</p>";
 }
