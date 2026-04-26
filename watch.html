@@ -40,13 +40,18 @@ document.getElementById("title").innerText = title;
 
 const video = document.getElementById("player");
 
-// 🔥 TRY FORCE PLAY
-video.src = videoSrc;
+// 💥 IMPORTANT FIX (type force)
+video.innerHTML = `
+  <source src="${videoSrc}" type="video/mp4">
+  <source src="${videoSrc}" type="video/webm">
+`;
 
-// ❌ Agar fail ho → open external
+// reload player
+video.load();
+
+// ❌ fail → fallback
 video.onerror = () => {
   alert("Player me nahi chal raha, external open ho raha hai");
-
   window.open(videoSrc, "_blank");
 };
 </script>
