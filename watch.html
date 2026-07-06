@@ -31,6 +31,14 @@ video {
   background: black; 
   border-radius: 8px;
 } 
+
+/* 🔥 FIX: Kuch devices me background se download button hide karne ke liye CSS Safety */
+video::-internal-media-controls-download-button {
+    display:none !important;
+}
+video::-webkit-media-controls-enclosure {
+    overflow:hidden !important;
+}
 </style> 
 </head>  
 
@@ -39,8 +47,8 @@ video {
 <div class="container">   
   <h2 id="title"></h2>   
   <div class="player-container">     
-    <!-- webkit-playsinline aur x5-playsinline mobile browsers/webviews ke liye helpful hote hain -->
-    <video id="player" controls autoplay playsinline webkit-playsinline x5-playsinline></video>   
+    <!-- 🔥 FIX: controlsList="nodownload" lagaya hai jisse 3-dot me download option gayab ho jayega -->
+    <video id="player" controls autoplay playsinline webkit-playsinline x5-playsinline controlsList="nodownload"></video>   
   </div> 
 </div>  
 
