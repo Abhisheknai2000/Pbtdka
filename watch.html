@@ -8,15 +8,28 @@
 <link rel="stylesheet" href="style.css">  
 
 <style> 
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0b0f19; /* Aapki app ka dark theme matching background */
+  font-family: sans-serif;
+  color: white;
+}
+.container {
+  padding: 15px;
+}
 .player-container {   
   width: 100%;   
   max-width: 900px;   
   margin: auto; 
+  position: relative;
 } 
 video {   
   width: 100%;   
-  height: 500px;   
+  height: auto; /* Fixed 500px hatakar auto kiya taaki ratio sahi rahe */
+  aspect-ratio: 16 / 9; /* Standard movie format */
   background: black; 
+  border-radius: 8px;
 } 
 </style> 
 </head>  
@@ -26,7 +39,8 @@ video {
 <div class="container">   
   <h2 id="title"></h2>   
   <div class="player-container">     
-    <video id="player" controls autoplay playsinline></video>   
+    <!-- webkit-playsinline aur x5-playsinline mobile browsers/webviews ke liye helpful hote hain -->
+    <video id="player" controls autoplay playsinline webkit-playsinline x5-playsinline></video>   
   </div> 
 </div>  
 
@@ -40,12 +54,32 @@ document.getElementById("title").innerText = title;
 
 const video = document.getElementById("player");  
 
-// 🔥 TRY FORCE PLAY 
 video.src = videoSrc;  
+
+// 🔥 Fullscreen hone par screen ko automatically rotate karne ki koshish (Agar WebView support kare)
+video.addEventListener('play', () => {
+  // Jab user play kare, agar aap fullscreen trigger karna chahein toh yahan se kar sakte hain.
+  // standard full screen automatic implementation on user click is handled by native controls
+});
+
+// Fullscreen mode change detect karke screen orientation request karna
+video.addEventListener('fullscreenchange', () => {
+  if (document.fullscreenElement) {
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch((err) => {
+        console.log("Orientation lock failed: ", err);
+      });
+    }
+  } else {
+    if (screen.orientation && screen.orientation.unlock) {
+      screen.orientation.unlock();
+    }
+  }
+});
 
 // ❌ Agar fail ho → open external 
 video.onerror = () => {   
-  alert("Player me nahi chal raha, external open ho raha hai");    
+  alert("Player me nahi chal raha, external open ho raha hai");     
   window.open(videoSrc, "_blank"); 
 }; 
 </script>  
