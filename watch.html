@@ -3,94 +3,77 @@
 <head> 
 <meta charset="UTF-8"> 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-
 <title>Watch</title> 
 <link rel="stylesheet" href="style.css">  
-
 <style> 
 body {
-  margin: 0;
-  padding: 0;
-  background-color: #0b0f19; /* Aapki app ka dark theme matching background */
-  font-family: sans-serif;
-  color: white;
+  margin: 0; padding: 0;
+  background-color: #0b0f19; font-family: sans-serif; color: white;
 }
-.container {
-  padding: 15px;
-}
-.player-container {   
-  width: 100%;   
-  max-width: 900px;   
-  margin: auto; 
-  position: relative;
-} 
-video {   
-  width: 100%;   
-  height: auto; /* Fixed 500px hatakar auto kiya taaki ratio sahi rahe */
-  aspect-ratio: 16 / 9; /* Standard movie format */
-  background: black; 
-  border-radius: 8px;
-} 
-
-/* 🔥 FIX: Kuch devices me background se download button hide karne ke liye CSS Safety */
-video::-internal-media-controls-download-button {
-    display:none !important;
-}
-video::-webkit-media-controls-enclosure {
-    overflow:hidden !important;
-}
+.container { padding: 15px; }
+.player-container { width: 100%; max-width: 900px; margin: auto; position: relative; } 
+video { width: 100%; height: auto; aspect-ratio: 16 / 9; background: black; border-radius: 8px; } 
+video::-internal-media-controls-download-button { display:none !important; }
+video::-webkit-media-controls-enclosure { overflow:hidden !important; }
 </style> 
 </head>  
-
 <body>  
-
 <div class="container">   
   <h2 id="title"></h2>   
   <div class="player-container">     
-    <!-- 🔥 FIX: controlsList="nodownload" lagaya hai jisse 3-dot me download option gayab ho jayega -->
     <video id="player" controls autoplay playsinline webkit-playsinline x5-playsinline controlsList="nodownload"></video>   
   </div> 
 </div>  
-
 <script> 
 const params = new URLSearchParams(window.location.search);  
-
 const videoSrc = decodeURIComponent(params.get("video") || ""); 
 const title = decodeURIComponent(params.get("title") || "");  
+// Image pass hokar aayegi home screen se history ke liye
+const imageSrc = decodeURIComponent(params.get("image") || "https://via.placeholder.com/300x400?text=No+Image");
 
 document.getElementById("title").innerText = title;  
-
 const video = document.getElementById("player");  
-
 video.src = videoSrc;  
 
-// 🔥 Fullscreen hone par screen ko automatically rotate karne ki koshish (Agar WebView support kare)
-video.addEventListener('play', () => {
-  // Jab user play kare, agar aap fullscreen trigger karna chahein toh yahan se kar sakte hain.
-  // standard full screen automatic implementation on user click is handled by native controls
+const storageKey = `resume_time_${btoa(title)}`; 
+
+// 🔄 1. LOAD TIME & SAVE TO HISTORY
+video.addEventListener('loadedmetadata', () => {
+  const savedTime = localStorage.getItem(storageKey);
+  if (savedTime) { video.currentTime = parseFloat(savedTime); }
+
+  // 🔥 HISTORY LOGIC: History array me save karna
+  let history = JSON.parse(localStorage.getItem("watch_history") || "[]");
+  // Purani duplicate movie list me se hatana taaki nayi wali sabse upar aaye
+  history = history.filter(item => item.title !== title);
+  // Nayi movie add karna
+  history.unshift({ title: title, video: videoSrc, image: imageSrc });
+  // Max 10 movies hi history me rakhein taaki memory full na ho
+  if (history.length > 10) history.pop();
+  localStorage.setItem("watch_history", JSON.stringify(history));
 });
 
-// Fullscreen mode change detect karke screen orientation request karna
-video.addEventListener('fullscreenchange', () => {
-  if (document.fullscreenElement) {
-    if (screen.orientation && screen.orientation.lock) {
-      screen.orientation.lock('landscape').catch((err) => {
-        console.log("Orientation lock failed: ", err);
-      });
-    }
+// ⏱️ 2. SAVE TIME
+video.addEventListener('timeupdate', () => {
+  if (video.currentTime / video.duration > 0.95) {
+    localStorage.removeItem(storageKey);
   } else {
-    if (screen.orientation && screen.orientation.unlock) {
-      screen.orientation.unlock();
-    }
+    localStorage.setItem(storageKey, video.currentTime);
   }
 });
 
-// ❌ Agar fail ho → open external 
+video.addEventListener('fullscreenchange', () => {
+  if (document.fullscreenElement && screen.orientation?.lock) {
+    screen.orientation.lock('landscape').catch(err => console.log(err));
+  } else if (!document.fullscreenElement && screen.orientation?.unlock) {
+    screen.orientation.unlock();
+  }
+});
+
 video.onerror = () => {   
   alert("Player me nahi chal raha, external open ho raha hai");     
   window.open(videoSrc, "_blank"); 
 }; 
 </script>  
-
 </body> 
 </html>
