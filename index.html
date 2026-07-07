@@ -6,45 +6,21 @@
 <title>Movies</title>
 <link rel="stylesheet" href="style.css">
 <style>
-  /* 🔍 Search Input and Container Styling */
-  .search-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    max-width: 300px;
-    width: 100%;
-  }
-  .search-box {
-    width: 100%;
-    padding: 8px 35px 8px 12px;
-    border-radius: 20px;
-    border: 1px solid #333;
-    background: #222;
-    color: #fff;
-    font-size: 14px;
-    outline: none;
-    transition: 0.3s;
-  }
-  .search-box:focus {
-    border-color: #00ffe1;
-    box-shadow: 0 0 8px rgba(0, 255, 225, 0.2);
-  }
-  .clear-btn {
-    position: absolute;
-    right: 12px;
-    background: transparent;
-    border: none;
-    color: #888;
-    cursor: pointer;
-    font-size: 14px;
-    display: none; /* Default me hidden rahega */
-  }
-  .clear-btn:hover {
-    color: #fff;
-  }
+  .search-container { position: relative; display: flex; align-items: center; max-width: 300px; width: 100%; }
+  .search-box { width: 100%; padding: 8px 35px 8px 12px; border-radius: 20px; border: 1px solid #333; background: #222; color: #fff; font-size: 14px; outline: none; transition: 0.3s; }
+  .search-box:focus { border-color: #00ffe1; box-shadow: 0 0 8px rgba(0, 255, 225, 0.2); }
+  .clear-btn { position: absolute; right: 12px; background: transparent; border: none; color: #888; cursor: pointer; font-size: 14px; display: none; }
+  .clear-btn:hover { color: #fff; }
+  
+  /* 🕒 History Section Styling */
+  .section-title { margin: 20px 0 10px 0; color: #00ffe1; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;}
+  .clear-history-btn { background: transparent; border: none; color: #ff4757; cursor: pointer; font-size: 12px; }
+  .history-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 30px; border-bottom: 1px solid #222; padding-bottom: 20px;}
+  @media (min-width: 600px) { .history-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 900px) { .history-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 1200px) { .history-grid { grid-template-columns: repeat(6, 1fr); } }
 </style>
 </head>
-
 <body>
 
 <div class="navbar">
@@ -56,6 +32,15 @@
 </div>
 
 <div class="container">
+  <div id="history-section" style="display: none;">
+    <div class="section-title">
+      <span>🕒 Continue Watching</span>
+      <button class="clear-history-btn" id="clear-history">Clear All</button>
+    </div>
+    <div class="history-grid" id="history-movies"></div>
+  </div>
+
+  <div class="section-title">🎬 All Movies</div>
   <div class="grid" id="movies"></div>
 </div>
 
