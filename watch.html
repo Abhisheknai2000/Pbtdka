@@ -8,57 +8,59 @@
   * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
   body { background-color: #000; font-family: sans-serif; color: white; overflow: hidden; width: 100vw; height: 100vh; }
   
-  /* Main Container */
   .player-container { 
     position: relative; width: 100vw; height: 100vh; background: black; 
     display: flex; justify-content: center; align-items: center; 
   }
   
-  /* Video Tag - Scale handling */
   video { 
-    width: 100%; height: 100%; object-fit: contain; /* Default Best Fit */
+    width: 100%; height: 100%; object-fit: contain; 
     transition: object-fit 0.2s ease;
   }
   
   /* Full Custom Overlay Controls */
   .controls-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.4); display: flex; flex-direction: column;
-    justify-content: space-between; z-index: 10; opacity: 1; transition: opacity 0.4s;
+    background: rgba(0, 0, 0, 0.5); display: flex; flex-direction: column;
+    justify-content: space-between; z-index: 10; opacity: 1; transition: opacity 0.3s;
   }
   .controls-overlay.hide { opacity: 0; pointer-events: none; }
 
-  /* Top Bar Controls */
+  /* Top Bar */
   .top-bar { padding: 15px; display: flex; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
   .back-btn { background: transparent; border: none; color: white; font-size: 24px; cursor: pointer; margin-right: 15px; }
   .movie-title { font-size: 18px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; }
 
-  /* Center Controls (Play/Pause, Rewind, Forward) */
+  /* Center Controls */
   .center-controls { display: flex; justify-content: center; align-items: center; gap: 40px; }
   .control-btn { background: rgba(255, 255, 255, 0.1); border: none; color: white; border-radius: 50%; width: 60px; height: 60px; font-size: 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; }
   .control-btn:hover, .control-btn:focus { background: #00ffe1; color: black; outline: none; transform: scale(1.1); }
   .main-play-btn { width: 80px; height: 80px; font-size: 30px; }
 
-  /* Bottom Bar Controls */
+  /* Bottom Bar */
   .bottom-bar { padding: 15px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); display: flex; flex-direction: column; gap: 10px; }
   .progress-container { display: flex; align-items: center; gap: 10px; width: 100%; }
   .time-display { font-size: 14px; min-width: 50px; }
-  .progress-bar { flex-grow: 1; height: 50px; display: flex; align-items: center; cursor: pointer; }
+  .progress-bar { flex-grow: 1; height: 30px; display: flex; align-items: center; cursor: pointer; }
   .progress-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.3); border-radius: 3px; position: relative; }
   .progress-fill { height: 100%; width: 0%; background: #00ffe1; border-radius: 3px; position: absolute; left: 0; top: 0; }
 
-  /* Action Row (Bottom Buttons) */
   .action-row { display: flex; justify-content: flex-end; align-items: center; gap: 20px; }
   .action-btn { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; }
   .action-btn:hover, .action-btn:focus { background: white; color: black; outline: none; }
 
-  /* Side Buttons (Lock / Volume) */
-  .side-controls { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 12; }
-  .lock-btn { background: rgba(0,0,0,0.6); border: 1px solid #fff; color: white; border-radius: 50%; width: 50px; height: 50px; font-size: 18px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-  .lock-btn.locked { border-color: #ff4757; color: #ff4757; }
-
-  /* Locked overlay screen state */
-  .locked-state-overlay { position: absolute; top:0; left:0; width:100%; height:100%; z-index: 15; display: none; }
+  /* 🔒 Lock Button UI */
+  .lock-overlay { 
+    position: absolute; top: 20px; left: 20px; z-index: 20; 
+    display: none; /* Default me hidden Rahega */
+    transition: opacity 0.3s;
+  }
+  .lock-btn { 
+    background: rgba(0,0,0,0.7); border: 2px solid #00ffe1; color: white; 
+    border-radius: 50%; width: 55px; height: 55px; font-size: 22px; cursor: pointer; 
+    display: flex; justify-content: center; align-items: center; box-shadow: 0 0 10px rgba(0,255,225,0.3);
+  }
+  .lock-btn:focus { outline: none; background: #00ffe1; color: black; }
 </style> 
 </head>  
 <body>  
@@ -67,11 +69,9 @@
   
   <video id="player" autoplay playsinline webkit-playsinline x5-playsinline></video>   
 
-  <div class="side-controls" id="side-controls">
-    <button class="lock-btn" id="lock-btn" title="Lock Screen">🔓</button>
+  <div class="lock-overlay" id="lock-overlay-container">
+    <button class="lock-btn" id="unlock-trigger-btn" title="Unlock Screen">🔒</button>
   </div>
-  
-  <div class="locked-state-overlay" id="locked-overlay"></div>
 
   <div class="controls-overlay" id="controls-menu">
     
@@ -98,6 +98,7 @@
       </div>
 
       <div class="action-row">
+        <button class="action-btn" id="lock-trigger-btn">Lock 🔓</button>
         <button class="action-btn" id="vol-down-btn">Vol -</button>
         <button class="action-btn" id="vol-up-btn">Vol +</button>
         <button class="action-btn" id="scale-btn">Ratio: Best Fit</button>
@@ -118,7 +119,8 @@ video.src = videoSrc;
 
 const storageKey = `resume_time_${btoa(titleStr)}`; 
 
-// Custom UI Element Hooks
+// UI Hooks
+const playerContainer = document.getElementById("player-container");
 const controlsMenu = document.getElementById("controls-menu");
 const playPauseBtn = document.getElementById("play-pause-btn");
 const rewindBtn = document.getElementById("rewind-btn");
@@ -128,14 +130,16 @@ const progressBar = document.getElementById("progress-bar");
 const currentTimeDisplay = document.getElementById("current-time");
 const totalDurationDisplay = document.getElementById("total-duration");
 const scaleBtn = document.getElementById("scale-btn");
-const lockBtn = document.getElementById("lock-btn");
-const lockedOverlay = document.getElementById("locked-overlay");
 const volUpBtn = document.getElementById("vol-up-btn");
 const volDownBtn = document.getElementById("vol-down-btn");
 
+// Lock related hooks
+const lockTriggerBtn = document.getElementById("lock-trigger-btn");
+const unlockTriggerBtn = document.getElementById("unlock-trigger-btn");
+const lockOverlayContainer = document.getElementById("lock-overlay-container");
+
 let hideControlsTimeout;
 let isLocked = false;
-// Aspect ratio cycle array
 const aspectModes = ["contain", "cover", "fill"];
 const aspectLabels = ["Best Fit", "Zoom/Fit Screen", "Stretch Full"];
 let currentAspectIdx = 0;
@@ -149,12 +153,10 @@ video.addEventListener('loadedmetadata', () => {
 
 // 2. TIME PROGRESS TRACKING & AUTO SAVE
 video.addEventListener('timeupdate', () => {
-  // Update time bar percentage
   const pct = (video.currentTime / video.duration) * 100;
   progressFill.style.width = `${pct}%`;
   currentTimeDisplay.innerText = formatTime(video.currentTime);
 
-  // Storage updates
   if (video.currentTime / video.duration > 0.95) {
     localStorage.removeItem(storageKey);
   } else {
@@ -176,11 +178,11 @@ function togglePlay() {
 playPauseBtn.onclick = togglePlay;
 
 // 10s Forward / Backward Operations
-rewindBtn.onclick = () => { video.currentTime = Math.max(0, video.currentTime - 10); resetControlsTimeout(); };
-forwardBtn.onclick = () => { video.currentTime = Math.min(video.duration, video.currentTime + 10); resetControlsTimeout(); };
+rewindBtn.onclick = (e) => { e.stopPropagation(); video.currentTime = Math.max(0, video.currentTime - 10); resetControlsTimeout(); };
+forwardBtn.onclick = (e) => { e.stopPropagation(); video.currentTime = Math.min(video.duration, video.currentTime + 10); resetControlsTimeout(); };
 
-// Timeline Scrubbing seeking handler
 progressBar.onclick = (e) => {
+  e.stopPropagation();
   const rect = progressBar.getBoundingClientRect();
   const clickX = e.clientX - rect.left;
   const width = rect.width;
@@ -188,64 +190,78 @@ progressBar.onclick = (e) => {
   resetControlsTimeout();
 };
 
-// Volume Adjustment Buttons (TV Support Native Alternative Interface)
-volUpBtn.onclick = () => { video.volume = Math.min(1, video.volume + 0.1); resetControlsTimeout(); };
-volDownBtn.onclick = () => { video.volume = Math.max(0, video.volume - 0.1); resetControlsTimeout(); };
+// 🔥 FIX: Volume Up/Down Work Perfectly Now
+volUpBtn.onclick = (e) => { 
+  e.stopPropagation(); 
+  video.muted = false; // volume change karne par un-mute confirm karein
+  video.volume = Math.min(1.0, Math.round((video.volume + 0.1) * 10) / 10); 
+  resetControlsTimeout(); 
+};
+volDownBtn.onclick = (e) => { 
+  e.stopPropagation(); 
+  video.volume = Math.max(0.0, Math.round((video.volume - 0.1) * 10) / 10); 
+  resetControlsTimeout(); 
+};
 
-// 🔥 ASPECT RATIO SWITCHING LOGIC (Fit to screen fix for TVs/Mobiles)
-scaleBtn.onclick = () => {
+// ASPECT RATIO SWITCHING LOGIC
+scaleBtn.onclick = (e) => {
+  e.stopPropagation();
   currentAspectIdx = (currentAspectIdx + 1) % aspectModes.length;
   video.style.objectFit = aspectModes[currentAspectIdx];
   scaleBtn.innerText = `Ratio: ${aspectLabels[currentAspectIdx]}`;
   resetControlsTimeout();
 };
 
-// LOCK CONTROLS LOGIC
-lockBtn.onclick = () => {
-  isLocked = !isLocked;
-  if(isLocked) {
-    lockBtn.innerText = "🔒";
-    lockBtn.classList.add("locked");
-    controlsMenu.classList.add("hide");
-    lockedOverlay.style.display = "block";
-  } else {
-    lockBtn.innerText = "🔓";
-    lockBtn.classList.remove("locked");
-    controlsMenu.classList.remove("hide");
-    lockedOverlay.style.display = "none";
-    resetControlsTimeout();
-  }
-};
-lockedOverlay.onclick = () => {
-  // Show lock button briefly when clicking an interface that is locked down
-  lockBtn.style.transform = "scale(1.3)";
-  setTimeout(() => lockBtn.style.transform = "scale(1)", 300);
+// 🔥 SMART LOCK & UNLOCK SYSTEM IMPLEMENTATION
+lockTriggerBtn.onclick = (e) => {
+  e.stopPropagation();
+  isLocked = true;
+  controlsMenu.classList.add("hide"); // Saare tools chhupa do
+  lockOverlayContainer.style.display = "block"; // Unlock button active karo
+  lockOverlayContainer.style.opacity = "1";
+  resetControlsTimeout();
 };
 
-// Custom Helpers for Visibility UI Control Timeout
-function showControls() {
-  if (isLocked) return;
+unlockTriggerBtn.onclick = (e) => {
+  e.stopPropagation();
+  isLocked = false;
+  lockOverlayContainer.style.display = "none"; // Unlock button chhipao
+  controlsMenu.classList.remove("hide"); // Saare tools wapas dikhao
+  resetControlsTimeout();
+};
+
+// 🔥 TOUCH / MOUSE / BUTTON EVENT DETECTION CONTROL SYSTEM
+function showControlsTemporarily() {
+  if (isLocked) {
+    // Agar locked hai, toh tools nahi, bas unlock button 4 seconds ke liye dikhega
+    lockOverlayContainer.style.opacity = "1";
+    lockOverlayContainer.style.display = "block";
+    clearTimeout(hideControlsTimeout);
+    hideControlsTimeout = setTimeout(() => {
+      if(isLocked) lockOverlayContainer.style.opacity = "0";
+    }, 4000);
+    return;
+  }
+  
   controlsMenu.classList.remove("hide");
   resetControlsTimeout();
 }
 
 function resetControlsTimeout() {
   clearTimeout(hideControlsTimeout);
-  if (!video.paused) {
+  if (!video.paused && !isLocked) {
     hideControlsTimeout = setTimeout(() => {
-      if (!isLocked) controlsMenu.classList.add("hide");
-    }, 4000); // 4 seconds idleness hides overlay controls layout
+      controlsMenu.classList.add("hide");
+    }, 4000); // 4 Seconds tak bina kisi touch/activity ke tools hide ho jayenge
   }
 }
 
-document.getElementById("player-container").onclick = (e) => {
-  if(e.target.id === "player-container" || e.target.id === "player") {
-    if(controlsMenu.classList.contains("hide")) { showControls(); } 
-    else { if(!video.paused) controlsMenu.classList.add("hide"); }
-  }
-};
+// User Interaction Listeners (Touch, Mouse Move, TV Remote click detection)
+playerContainer.addEventListener("mousemove", showControlsTemporarily);
+playerContainer.addEventListener("click", showControlsTemporarily);
+playerContainer.addEventListener("touchstart", showControlsTemporarily);
+window.addEventListener("keydown", showControlsTemporarily); // TV Remote Button click support
 
-// Formatter setup strings conversion
 function formatTime(seconds) {
   if (isNaN(seconds)) return "00:00";
   const h = Math.floor(seconds / 3600);
@@ -259,7 +275,6 @@ function goBack() {
   window.history.back();
 }
 
-// Global window event setup integration trigger for orientation setup
 window.addEventListener('DOMContentLoaded', () => {
   if (screen.orientation?.lock) {
     screen.orientation.lock('landscape').catch(() => {});
