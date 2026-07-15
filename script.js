@@ -1,9 +1,9 @@
 const sheetURL = "https://opensheet.elk.sh/1xwRMs5i1KFZq9AyDr_XbnD53srpoV8gYuKxRLXaPt7U/Sheet1";
 let allMovies = []; 
 
-// Page Load hote hi sabse pehle history load karo
 document.addEventListener("DOMContentLoaded", () => {
     loadWatchHistory();
+    triggerFloatingAd(); // Page load par floating ad initialize karna
 });
 
 fetch(sheetURL)
@@ -40,7 +40,6 @@ function displayMovies(moviesList) {
 
         card.onclick = () => {
             if (video) {
-                // 🔥 FIX: Image bhi url me bhej rahe hain taaki history me photo dikh sake
                 window.location.href = `watch.html?video=${encodeURIComponent(video)}&title=${encodeURIComponent(title)}&image=${encodeURIComponent(image)}`;
             } else {
                 alert("Video link not available");
@@ -85,9 +84,49 @@ function loadWatchHistory() {
 document.getElementById("clear-history").onclick = () => {
     if(confirm("Kya aap saari history delete karna chahte hain?")) {
         localStorage.removeItem("watch_history");
-        loadWatchHistory(); // Section hide karne ke liye reload
+        loadWatchHistory(); 
     }
 };
+
+// 📢 🔥 FLOATING AD AUTO TIMED CONTROL LOGIC
+function triggerFloatingAd() {
+    const adContainer = document.getElementById("popup-ad-container");
+    const closeBtn = document.getElementById("manual-close-ad");
+    const timerText = document.getElementById("ad-timer-text");
+    
+    let timeLeft = 15; // 15 Seconds Countdown timer
+
+    // 1. Page load hone ke 2 second baad screen me slide-in karein (thoda delay safe lagta hai)
+    setTimeout(() => {
+        adContainer.classList.add("show");
+        
+        // 2. Countdown loop trigger
+        const adInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft > 0) {
+                timerText.innerText = `Closing in ${timeLeft}s...`;
+            } else {
+                clearInterval(adInterval);
+                closeAd(); // 15 seconds baad automatic slide-out close
+            }
+        }, 1000);
+
+        // 3. User manual-close (cross button) operation
+        closeBtn.onclick = () => {
+            clearInterval(adInterval);
+            closeAd();
+        };
+
+    }, 2000);
+
+    function closeAd() {
+        adContainer.classList.remove("show"); // Slide-out effect trigger
+        // Slide out ke baad completely disable karna taaki user layout click block na ho
+        setTimeout(() => {
+            adContainer.style.display = "none";
+        }, 600);
+    }
+}
 
 // 🔍 SEARCH LOGIC
 const searchInput = document.getElementById("search-input");
@@ -99,10 +138,10 @@ searchInput.addEventListener("input", (e) => {
 
     if (searchTerm.length > 0) {
         clearSearchBtn.style.display = "block";
-        historySection.style.display = "none"; // Search karte waqt history chhupa do
+        historySection.style.display = "none"; 
     } else {
         clearSearchBtn.style.display = "none";
-        loadWatchHistory(); // Search clear hone par history wapas dikhao
+        loadWatchHistory();
     }
 
     const filteredMovies = allMovies.filter(movie => {
