@@ -19,6 +19,75 @@
   @media (min-width: 600px) { .history-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (min-width: 900px) { .history-grid { grid-template-columns: repeat(4, 1fr); } }
   @media (min-width: 1200px) { .history-grid { grid-template-columns: repeat(6, 1fr); } }
+
+  /* 📢 Floating Ad Box Popup Styles */
+  .floating-ad-container {
+    position: fixed;
+    bottom: -200px; /* Shuru me screen se bahar niche rahega */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px; /* Responsive mobile pop-up size */
+    background: #151a26;
+    border: 2px solid #00ffe1;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 -5px 25px rgba(0, 255, 225, 0.3);
+    z-index: 9999; /* Sabse upar dikhane ke liye */
+    transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth slide-in effect */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .floating-ad-container.show {
+    bottom: 20px; /* Slide hokar screen ke andar aa jana */
+  }
+  .ad-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  .ad-tag {
+    font-size: 10px;
+    color: #00ffe1;
+    background: rgba(0, 255, 225, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+  .ad-timer-label {
+    font-size: 11px;
+    color: #888;
+  }
+  .ad-close-cross {
+    background: #ff4757;
+    border: none;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+  }
+  .ad-close-cross:hover {
+    background: #ff6b81;
+    transform: scale(1.1);
+  }
+  .ad-iframe-box {
+    width: 100%;
+    height: 150px; /* Thoda bada box jo achhi viewability de */
+    border: none;
+    background: #000;
+    border-radius: 8px;
+  }
 </style>
 </head>
 <body>
@@ -32,6 +101,7 @@
 </div>
 
 <div class="container">
+  <!-- 🕒 History Section -->
   <div id="history-section" style="display: none;">
     <div class="section-title">
       <span>🕒 Continue Watching</span>
@@ -40,6 +110,18 @@
     <div class="history-grid" id="history-movies"></div>
   </div>
 
+  <!-- 📢 🔥 FLOATING POPUP AD CONTAINER -->
+  <div class="floating-ad-container" id="popup-ad-container">
+    <div class="ad-top-bar">
+      <span class="ad-tag">Ad</span>
+      <span class="ad-timer-label" id="ad-timer-text">Closing in 15s...</span>
+      <button class="ad-close-cross" id="manual-close-ad" title="Close Ad">✖</button>
+    </div>
+    <!-- 👉 Yahan src="" me apna direct link ya banner script iframe load karein -->
+    <iframe class="ad-iframe-box" src="https://example.com/placeholder-ad" id="ad-iframe-element"></iframe>
+  </div>
+
+  <!-- Main Grid -->
   <div class="section-title">🎬 All Movies</div>
   <div class="grid" id="movies"></div>
 </div>
